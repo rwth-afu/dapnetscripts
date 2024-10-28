@@ -1,0 +1,33 @@
+---
+name: MegaLinter
+on: [push, pull_request]
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  megalinter:
+    name: MegaLinter
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      
+      - name: Install dependencies
+        run: |
+          python3 -m pip install -r requirements.txt
+
+      - name: Run MegaLinter
+        id: ml
+        uses: oxsecurity/megalinter@v8
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MEGALINTER_CONFIG: .github/linters/mega-linter.yml
