@@ -7,13 +7,14 @@ class Tools:
     def __init__(self):
         self.data = []
 
-    def make7bitclean(self, s):
+    @staticmethod
+    def make7bitclean(s):
         s = str(s)
-        s = s.replace(u"ä", "{")
-        s = s.replace(u"ö", "|")
-        s = s.replace(u"ü", "}")
-        s = s.replace(u"Ä", "[")
-        s = s.replace(u"Ö", "\\")
-        s = s.replace(u"Ü", "]")
-        s = s.replace(u"ß", "~")
+        s = s.replace("ä", "{")
+        s = s.replace("ö", "|")
+        s = s.replace("ü", "}")
+        s = s.replace("Ä", "[")
+        s = s.replace("Ö", "\\")
+        s = s.replace("Ü", "]")
+        s = s.replace("ß", "~")
         return s

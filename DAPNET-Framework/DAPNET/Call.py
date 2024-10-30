@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import requests
-from Tools import Tools
 from requests.auth import HTTPBasicAuth
+from Tools import Tools
 
 
 class Call:
