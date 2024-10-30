@@ -20,7 +20,7 @@ slot = 1
 
 def fetch_kepler_data():
     url = "https://www.celestrak.com/NORAD/elements/stations.txt"
-    response = requests.get(url)
+    response = requests.get(url, timeout=30)
 
     if response.status_code == 200:
         with open(KEPLER_DATA_FILE, "w") as file:
