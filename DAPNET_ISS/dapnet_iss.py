@@ -37,18 +37,19 @@ def get_kepler_data():
     else:
         print("Verwende die gespeicherten Kepler-Daten.")
 
+
 def load_config(filename="config_dapnet_iss.ini"):
     current_dir = os.getcwd()
     config = configparser.ConfigParser()
     config_file = current_dir + '/' + filename
     config.read(config_file)
-    
+
     latitude = float(config["Location"]["latitude"])
     longitude = float(config["Location"]["longitude"])
     elevation = float(config["Location"]["elevation"])
     news = News(config['DAPNET']['dapnetuser'], config['DAPNET']['dapnetpasswd'])
     rubrik = config['DAPNET']['rubrik']
-    
+
     return latitude, longitude, elevation, news, rubrik
 
 
@@ -69,14 +70,13 @@ def get_iss_passes(latitude, longitude, elevation):
     satellite = EarthSatellite(tle_line1, tle_line2, "ISS (ZARYA)", ts)
     now = ts.now()
     end_time = now + timedelta(hours=24)
-    
+
     # Ereignisse (Aufgang, maximale Höhe, Untergang) finden
     t0, events = satellite.find_events(location, now, end_time, altitude_degrees=10.0)
-    berlin_tz = pytz.timezone("Europe/Berlin")
-    
+
     passes = []
     for ti, event in zip(t0, events):
-        local_time = ti.utc_datetime().replace(tzinfo=pytz.utc).astimezone(berlin_tz)
+        local_time = ti.utc_datetime()
         if event == 0:
             passes.append(("Rise", local_time))
         elif event == 1:
@@ -110,4 +110,3 @@ latitude, longitude, elevation, news, rubrik = load_config(CONFIG_FILE)
 get_kepler_data()
 iss_passes = get_iss_passes(latitude, longitude, elevation)
 check_for_announcement(iss_passes, news, rubrik)
-
