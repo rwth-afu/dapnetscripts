@@ -1,13 +1,14 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+
 import requests
-from DAPNET.Tools import Tools
+from Tools import Tools
 from requests.auth import HTTPBasicAuth
 
 
 class News:
     # alternate URL: https://hampager.de/api
-    def __init__(self, username, password, host="http://44.149.166.27:8080"):
+    def __init__(self, username, password, host="http://44.149.166.27:8080"):  # DevSkim: ignore DS137138
         self.username, self.password, self.host = username, password, host
 
     def send(self, message, rubric, slot=0):
@@ -24,10 +25,18 @@ class News:
 
         # and sending it to DAPNET
         try:
-            resp = requests.post(self.host+"/news/", json=post, auth=HTTPBasicAuth(self.username, self.password))
+            resp = requests.post(
+                self.host + "/news/",
+                json=post,
+                auth=HTTPBasicAuth(self.username, self.password),
+                timeout=10,
+            )
             if resp.status_code != 201:
-                print('Error: POST /news/ {} post: {}'.format(resp.status_code, post))
+                print("Error: POST /news/ {} post: {}".format(resp.status_code, post))
             else:
-                print('Success: POST /news/ {} post: {}'.format(resp.status_code, post))
-        except:
-            pass
+                print("Success: POST /news/ {} post: {}".format(resp.status_code, post))
+        except requests.exceptions.Timeout:
+            print("Timed out")
+        except Exception as ex:
+            print("Unexpected error: " + str(ex))
+            raise
