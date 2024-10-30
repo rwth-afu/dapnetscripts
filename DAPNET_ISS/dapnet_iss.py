@@ -3,9 +3,10 @@ import os
 import sys
 import time as mytime
 from datetime import datetime, timedelta
+
 import pytz
 import requests
-from skyfield.api import Topos, load, EarthSatellite
+from skyfield.api import EarthSatellite, Topos, load
 
 sys.path.append('..')
 from DAPNET import News
