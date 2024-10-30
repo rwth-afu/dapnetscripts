@@ -4,7 +4,6 @@ import time as mytime
 from skyfield.api import Topos, load, EarthSatellite
 from datetime import datetime, timedelta
 import pytz
-import subprocess
 import os
 import sys
 
@@ -18,6 +17,7 @@ CONFIG_FILE = 'config_dapnet_iss.ini'
 
 slot = 1
 
+
 def fetch_kepler_data():
     url = "https://www.celestrak.com/NORAD/elements/stations.txt"
     response = requests.get(url)
@@ -29,13 +29,14 @@ def fetch_kepler_data():
     else:
         print(f"Fehler beim Abrufen der Kepler-Daten: {response.status_code}")
 
+
 def get_kepler_data():
     if not os.path.exists(KEPLER_DATA_FILE) or \
        (mytime.time() - os.path.getmtime(KEPLER_DATA_FILE) > UPDATE_INTERVAL):
         fetch_kepler_data()
     else:
         print("Verwende die gespeicherten Kepler-Daten.")
-    
+
 def load_config(filename="config_dapnet_iss.ini"):
     current_dir = os.getcwd()
     config = configparser.ConfigParser()
@@ -50,6 +51,7 @@ def load_config(filename="config_dapnet_iss.ini"):
     
     return latitude, longitude, elevation, news, rubrik
 
+
 def fetch_iss_tle():
     # Lade Kepler-Daten
     with open(KEPLER_DATA_FILE, "r") as file:
@@ -57,6 +59,7 @@ def fetch_iss_tle():
         for i, line in enumerate(lines):
             if line.strip() == "ISS (ZARYA)":
                 return lines[i + 1], lines[i + 2]
+
 
 def get_iss_passes(latitude, longitude, elevation):
     # Standort und Zeitkonfiguration
@@ -80,8 +83,8 @@ def get_iss_passes(latitude, longitude, elevation):
             passes.append(("Maximum", local_time))
         elif event == 2:
             passes.append(("Set", local_time))
-    
     return passes
+
 
 def announce_event(event, event_time, news, rubrik):
     global slot
@@ -91,7 +94,7 @@ def announce_event(event, event_time, news, rubrik):
     slot += 1
     if slot == 11:
         slot = 1
-    
+
 
 # Prüfe, ob eine Ansage nötig ist
 def check_for_announcement(passes, news, rubrik):
@@ -101,8 +104,10 @@ def check_for_announcement(passes, news, rubrik):
         if 239.5 <= delta <= 240.5 or 59.5 <= delta <= 60.5 or 0.5 <= delta <= 1.5 or delta <= 0.5:
             announce_event(event, time, news, rubrik)
 
+
 # Test der Berechnungen und Ansagen
 latitude, longitude, elevation, news, rubrik = load_config(CONFIG_FILE)
 get_kepler_data()
 iss_passes = get_iss_passes(latitude, longitude, elevation)
 check_for_announcement(iss_passes, news, rubrik)
+
