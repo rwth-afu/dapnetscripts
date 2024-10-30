@@ -75,18 +75,18 @@ def get_iss_passes(latitude, longitude, elevation):
     for ti, event in zip(t0, events):
         local_time = ti.utc_datetime().replace(tzinfo=pytz.utc).astimezone(berlin_tz)
         if event == 0:
-            passes.append(("Aufgang", local_time))
+            passes.append(("Rise", local_time))
         elif event == 1:
-            passes.append(("Maximale Höhe", local_time))
+            passes.append(("Maximum", local_time))
         elif event == 2:
-            passes.append(("Untergang", local_time))
+            passes.append(("Set", local_time))
     
     return passes
 
 def announce_event(event, event_time, news, rubrik):
     global slot
     # Text für Rurbik
-    announcement = f"{event} der ISS um {event_time.strftime('%H:%M')} Uhr."
+    announcement = f"{event} of ISS at {event_time.strftime('%H:%M')} UTC."
     news.send(announcement, rubrik, slot)
     slot += 1
     if slot == 11:
@@ -95,7 +95,7 @@ def announce_event(event, event_time, news, rubrik):
 
 # Prüfe, ob eine Ansage nötig ist
 def check_for_announcement(passes, news, rubrik):
-    now = datetime.now(pytz.timezone("Europe/Berlin"))
+    now = datetime.now(pytz.timezone("UTC"))
     for event, time in passes:
         delta = (time - now).total_seconds() / 60  # Differenz in Minuten
         if 239.5 <= delta <= 240.5 or 59.5 <= delta <= 60.5 or 0.5 <= delta <= 1.5 or delta <= 0.5:
