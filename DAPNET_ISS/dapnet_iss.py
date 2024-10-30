@@ -1,11 +1,11 @@
 import configparser
-import requests
-import time as mytime
-from skyfield.api import Topos, load, EarthSatellite
-from datetime import datetime, timedelta
-import pytz
 import os
 import sys
+import time as mytime
+from datetime import datetime, timedelta
+import pytz
+import requests
+from skyfield.api import Topos, load, EarthSatellite
 
 sys.path.append('..')
 from DAPNET import News
