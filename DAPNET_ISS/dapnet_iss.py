@@ -16,8 +16,6 @@ KEPLER_DATA_FILE = "kepler_data.txt"
 UPDATE_INTERVAL = 14400  # 4 Stunden in Sekunden
 CONFIG_FILE = 'config_dapnet_iss.ini'
 
-slot = 1
-
 
 def fetch_kepler_data():
     url = "https://www.celestrak.com/NORAD/elements/stations.txt"
@@ -79,31 +77,27 @@ def get_iss_passes(latitude, longitude, elevation):
     for ti, event in zip(t0, events):
         local_time = ti.utc_datetime()
         if event == 0:
-            passes.append(("Rise", local_time))
+            passes.append(("Rise", local_time, 1))
         elif event == 1:
-            passes.append(("Maximum", local_time))
+            passes.append(("Maximum", local_time, 2))
         elif event == 2:
-            passes.append(("Set", local_time))
+            passes.append(("Set", local_time, 3))
     return passes
 
 
-def announce_event(event, event_time, news, rubrik):
-    global slot
+def announce_event(event, event_time, news, rubrik, slot):
     # Text für Rurbik
     announcement = f"{event} of ISS at {event_time.strftime('%H:%M')} UTC."
     news.send(announcement, rubrik, slot)
-    slot += 1
-    if slot == 11:
-        slot = 1
 
 
 # Prüfe, ob eine Ansage nötig ist
 def check_for_announcement(passes, news, rubrik):
     now = datetime.now(pytz.timezone("UTC"))
-    for event, time in passes:
+    for event, time, slot in passes:
         delta = (time - now).total_seconds() / 60  # Differenz in Minuten
         if 239.5 <= delta <= 240.5 or 59.5 <= delta <= 60.5 or 0.5 <= delta <= 1.5 or delta <= 0.5:
-            announce_event(event, time, news, rubrik)
+            announce_event(event, time, news, rubrik, slot)
 
 
 # Test der Berechnungen und Ansagen
