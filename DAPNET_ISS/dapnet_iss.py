@@ -8,13 +8,13 @@ import pytz
 import requests
 from skyfield.api import EarthSatellite, Topos, load
 
-sys.path.append('..')
+sys.path.append("..")
 from DAPNET import News
 
 # Konstanten
 KEPLER_DATA_FILE = "kepler_data.txt"
 UPDATE_INTERVAL = 14400  # 4 Stunden in Sekunden
-CONFIG_FILE = 'config_dapnet_iss.ini'
+CONFIG_FILE = "config_dapnet_iss.ini"
 
 
 def fetch_kepler_data():
@@ -30,8 +30,7 @@ def fetch_kepler_data():
 
 
 def get_kepler_data():
-    if not os.path.exists(KEPLER_DATA_FILE) or \
-       (mytime.time() - os.path.getmtime(KEPLER_DATA_FILE) > UPDATE_INTERVAL):
+    if not os.path.exists(KEPLER_DATA_FILE) or (mytime.time() - os.path.getmtime(KEPLER_DATA_FILE) > UPDATE_INTERVAL):
         fetch_kepler_data()
     else:
         print("Verwende die gespeicherten Kepler-Daten.")
@@ -40,14 +39,14 @@ def get_kepler_data():
 def load_config(filename="config_dapnet_iss.ini"):
     current_dir = os.getcwd()
     config = configparser.ConfigParser()
-    config_file = current_dir + '/' + filename
+    config_file = current_dir + "/" + filename
     config.read(config_file)
 
     latitude = float(config["Location"]["latitude"])
     longitude = float(config["Location"]["longitude"])
     elevation = float(config["Location"]["elevation"])
-    news = News(config['DAPNET']['dapnetuser'], config['DAPNET']['dapnetpasswd'])
-    rubrik = config['DAPNET']['rubrik']
+    news = News(config["DAPNET"]["dapnetuser"], config["DAPNET"]["dapnetpasswd"])
+    rubrik = config["DAPNET"]["rubrik"]
 
     return latitude, longitude, elevation, news, rubrik
 
