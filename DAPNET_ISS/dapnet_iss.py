@@ -1,4 +1,5 @@
 import configparser
+import json
 import os
 import sys
 import time as mytime
@@ -15,6 +16,7 @@ from DAPNET import News
 KEPLER_DATA_FILE = "kepler_data.txt"
 UPDATE_INTERVAL = 14400  # 4 Stunden in Sekunden
 CONFIG_FILE = "config_dapnet_iss.ini"
+LOCATIONS_FILE = "locations.json"
 
 
 def fetch_kepler_data():
@@ -41,14 +43,16 @@ def load_config(filename="config_dapnet_iss.ini"):
     config = configparser.ConfigParser()
     config_file = current_dir + "/" + filename
     config.read(config_file)
-
-    latitude = float(config["Location"]["latitude"])
-    longitude = float(config["Location"]["longitude"])
-    elevation = float(config["Location"]["elevation"])
     news = News(config["DAPNET"]["dapnetuser"], config["DAPNET"]["dapnetpasswd"])
-    rubrik = config["DAPNET"]["rubrik"]
+    return news
 
-    return latitude, longitude, elevation, news, rubrik
+
+def load_locations(filename="locations.json"):
+    current_dir = os.getcwd()
+    locations_file = current_dir + "/" + filename
+    with open(locations_file, "r") as file:
+        locations = json.load(file)
+    return locations
 
 
 def fetch_iss_tle():
@@ -85,12 +89,11 @@ def get_iss_passes(latitude, longitude, elevation):
 
 
 def announce_event(event, event_time, news, rubrik, slot):
-    # Text für Rurbik
+    # Text für Rubrik
     announcement = f"{event} of ISS at {event_time.strftime('%H:%M')} UTC."
     news.send(announcement, rubrik, slot)
 
 
-# Prüfe, ob eine Ansage nötig ist
 def check_for_announcement(passes, news, rubrik):
     now = datetime.now(pytz.timezone("UTC"))
     for event, time, slot in passes:
@@ -99,8 +102,18 @@ def check_for_announcement(passes, news, rubrik):
             announce_event(event, time, news, rubrik, slot)
 
 
-# Test der Berechnungen und Ansagen
-latitude, longitude, elevation, news, rubrik = load_config(CONFIG_FILE)
+# Hauptlogik für alle Standorte
+news = load_config(CONFIG_FILE)
 get_kepler_data()
-iss_passes = get_iss_passes(latitude, longitude, elevation)
-check_for_announcement(iss_passes, news, rubrik)
+locations = load_locations(LOCATIONS_FILE)
+
+for location in locations:
+    latitude = location["latitude"]
+    longitude = location["longitude"]
+    elevation = location["elevation"]
+    rubrik = location["rubrik"]
+
+    print(f"Prüfe ISS-Durchgänge für {location['name']}...")
+    iss_passes = get_iss_passes(latitude, longitude, elevation)
+    check_for_announcement(iss_passes, news, rubrik)
+
