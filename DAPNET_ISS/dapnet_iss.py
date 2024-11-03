@@ -116,4 +116,3 @@ for location in locations:
     print(f"Prüfe ISS-Durchgänge für {location['name']}...")
     iss_passes = get_iss_passes(latitude, longitude, elevation)
     check_for_announcement(iss_passes, news, rubrik)
-
